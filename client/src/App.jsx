@@ -1,7 +1,8 @@
-import React, { lazy } from 'react'
+import React, { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ProtectRouter from './components/auth/ProtectRouter';
 import Notfound from './pages/Notfound';
+import { LayoutLoader } from './components/layout/Loaders';
 
 // used for dynamic importing the home component only when it is needed.
 const Home = lazy(() => import("./pages/Home"));
@@ -15,21 +16,23 @@ let user = true;
 const App = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<ProtectRouter user={user} />}>
-          <Route path='/' element={<Home />} />
-          <Route path='/chat/:chatId' element={<Chat />} />
-          <Route path='/groups' element={<Groups />} />
+      <Suspense fallback={<LayoutLoader/>}>
+        <Routes>
+          <Route path='/' element={<ProtectRouter user={user} />}>
+            <Route path='/' element={<Home />} />
+            <Route path='/chat/:chatId' element={<Chat />} />
+            <Route path='/groups' element={<Groups />} />
 
-        </Route>
-        <Route path='/login' element={
-          <ProtectRouter user={!user}>
-            <Login />
-          </ProtectRouter>
-        } />
+          </Route>
+          <Route path='/login' element={
+            <ProtectRouter user={!user}>
+              <Login />
+            </ProtectRouter>
+          } />
 
-        <Route path='*' element={<Notfound />} />
-      </Routes>
+          <Route path='*' element={<Notfound />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }
